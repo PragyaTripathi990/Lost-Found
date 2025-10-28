@@ -1,0 +1,38 @@
+{
+  "name": "lost-found-app",
+  "version": "1.0.0",
+  "description": "AI-powered Lost & Found application with semantic search",
+  "main": "index.js",
+  "scripts": {
+    "setup": "./scripts/setup.sh",
+    "dev": "./scripts/start-dev.sh",
+    "install-all": "cd frontend && npm install && cd ../backend && npm install && cd ../python-ai && pip install -r requirements.txt",
+    "start-backend": "cd backend && npm run dev",
+    "start-ai": "cd python-ai && source venv/bin/activate && python app.py",
+    "start-frontend": "cd frontend && npm run dev",
+    "build": "cd frontend && npm run build",
+    "test": "echo 'No tests specified' && exit 0"
+  },
+  "keywords": [
+    "lost",
+    "found",
+    "ai",
+    "search",
+    "clip",
+    "embeddings",
+    "react",
+    "nodejs",
+    "postgresql",
+    "supabase"
+  ],
+  "author": "",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/lost-found-app.git"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "python": ">=3.8.0"
+  }
+}
