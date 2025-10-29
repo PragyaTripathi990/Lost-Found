@@ -2,8 +2,9 @@
   "name": "lost-found-app",
   "version": "1.0.0",
   "description": "AI-powered Lost & Found application with semantic search",
-  "main": "index.js",
+  "main": "backend/server.js",
   "scripts": {
+    "start": "cd backend && npm start",
     "setup": "./scripts/setup.sh",
     "dev": "./scripts/start-dev.sh",
     "install-all": "cd frontend && npm install && cd ../backend && npm install && cd ../python-ai && pip install -r requirements.txt",
