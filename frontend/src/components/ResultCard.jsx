@@ -2,12 +2,23 @@ import React from 'react';
 import { MapPin, Calendar, Clock, Eye, MessageCircle } from 'lucide-react';
 
 const ResultCard = ({ item }) => {
+  const [showDetails, setShowDetails] = React.useState(false);
+
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'short',
       day: 'numeric'
     });
+  };
+
+  const handleContact = () => {
+    // For now, show an alert. In a real app, this would open a contact modal or redirect
+    alert(`Contact information for "${item.title}"\n\nThis would typically show:\n- Contact person name\n- Phone number\n- Email\n- Preferred contact method`);
+  };
+
+  const handleViewDetails = () => {
+    setShowDetails(!showDetails);
   };
 
   const getTypeColor = (type) => {
@@ -88,14 +99,36 @@ const ResultCard = ({ item }) => {
 
         {/* Actions */}
         <div className="flex space-x-3">
-          <button className="flex-1 bg-gradient-to-r from-blue-600 to-indigo-700 text-white text-sm py-3 px-4 rounded-xl hover:from-blue-700 hover:to-indigo-800 transition-all duration-200 flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl font-medium">
+          <button 
+            onClick={handleContact}
+            className="flex-1 bg-gradient-to-r from-blue-600 to-indigo-700 text-white text-sm py-3 px-4 rounded-xl hover:from-blue-700 hover:to-indigo-800 transition-all duration-200 flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl font-medium"
+          >
             <MessageCircle className="w-4 h-4" />
             <span>Contact</span>
           </button>
-          <button className="px-4 py-3 border border-gray-300 text-gray-700 text-sm rounded-xl hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 font-medium">
-            View
+          <button 
+            onClick={handleViewDetails}
+            className="px-4 py-3 border border-gray-300 text-gray-700 text-sm rounded-xl hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 font-medium"
+          >
+            {showDetails ? 'Hide' : 'View'}
           </button>
         </div>
+
+        {/* Expanded Details */}
+        {showDetails && (
+          <div className="mt-4 p-4 bg-gray-50 rounded-xl border border-gray-200">
+            <h5 className="font-semibold text-gray-900 mb-2">Additional Details</h5>
+            <div className="space-y-2 text-sm text-gray-600">
+              <div><strong>Item ID:</strong> {item.id}</div>
+              <div><strong>Full Description:</strong> {item.description}</div>
+              <div><strong>Exact Location:</strong> {item.location}</div>
+              <div><strong>Posted:</strong> {formatDate(item.created_at)}</div>
+              {item.similarity_score && (
+                <div><strong>AI Match Score:</strong> {getSimilarityScore(item.similarity_score)}%</div>
+              )}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

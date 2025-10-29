@@ -7,6 +7,7 @@ const initialState = {
   isLoading: false,
   searchQuery: '',
   searchType: 'text', // 'text', 'image', 'hybrid'
+  hasSearched: false, // Track if a search has been performed
   filters: {
     type: '', // 'lost', 'found', or ''
     location: ''
@@ -24,6 +25,7 @@ const searchReducer = (state, action) => {
         ...state, 
         searchResults: action.payload, 
         isLoading: false,
+        hasSearched: true, // Mark that a search has been performed
         error: null 
       };
     
@@ -51,6 +53,7 @@ const searchReducer = (state, action) => {
         ...state, 
         searchResults: [], 
         searchQuery: '',
+        hasSearched: false, // Reset search status
         error: null 
       };
     

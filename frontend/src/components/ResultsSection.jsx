@@ -4,7 +4,10 @@ import { useSearch } from '../context/SearchContext';
 import ResultCard from './ResultCard';
 
 const ResultsSection = () => {
-  const { searchResults, isLoading, error, searchQuery } = useSearch();
+  const { searchResults, isLoading, error, searchQuery, hasSearched } = useSearch();
+  
+  // Ensure searchResults is always an array
+  const safeSearchResults = Array.isArray(searchResults) ? searchResults : [];
 
   if (isLoading) {
     return (
@@ -28,7 +31,8 @@ const ResultsSection = () => {
     );
   }
 
-  if (searchResults.length === 0 && searchQuery) {
+  // Only show "No Results" if we have actually performed a search (not loading and hasSearched is true)
+  if (safeSearchResults.length === 0 && hasSearched && !isLoading) {
     return (
       <div className="bg-white/70 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 p-12">
         <div className="text-center">
@@ -42,7 +46,8 @@ const ResultsSection = () => {
     );
   }
 
-  if (searchResults.length === 0) {
+  // Don't show anything if no search has been performed yet
+  if (safeSearchResults.length === 0 && !hasSearched) {
     return null;
   }
 
@@ -58,13 +63,13 @@ const ResultsSection = () => {
           )}
         </h3>
         <p className="text-gray-600 text-lg">
-          {searchResults.length} item{searchResults.length !== 1 ? 's' : ''} found using AI similarity search
+          {safeSearchResults.length} item{safeSearchResults.length !== 1 ? 's' : ''} found using AI similarity search
         </p>
       </div>
 
       <div className="p-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {searchResults.map((item) => (
+          {safeSearchResults.map((item) => (
             <ResultCard key={item.id} item={item} />
           ))}
         </div>

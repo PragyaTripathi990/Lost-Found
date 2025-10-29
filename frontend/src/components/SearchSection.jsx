@@ -27,12 +27,12 @@ const SearchSection = () => {
 
     setLoading(true);
     try {
-      const results = await searchItems({
+      const response = await searchItems({
         type: 'text',
         query: searchQuery,
         filters
       });
-      setResults(results);
+      setResults(response.data || []);
     } catch (error) {
       setError('Search failed. Please try again.');
     }
@@ -44,12 +44,12 @@ const SearchSection = () => {
 
     setLoading(true);
     try {
-      const results = await searchItems({
+      const response = await searchItems({
         type: 'image',
         imageFile,
         filters
       });
-      setResults(results);
+      setResults(response.data || []);
     } catch (error) {
       setError('Image search failed. Please try again.');
     }

@@ -12,11 +12,11 @@ console.log('🔍 Supabase Key (first 20 chars):', supabaseKey.substring(0, 20) 
 export const supabase = createClient(supabaseUrl, supabaseKey);
 
 // PostgreSQL connection for vector operations
-const databaseUrl = 'postgresql://postgres:Pragya123Tripathi@db.uiazxxywirupzjxhuqgu.supabase.co:5432/postgres';
+const databaseUrl = 'postgresql://neondb_owner:npg_sB28ISJnlZWO@ep-hidden-band-ahdvot0u-pooler.c-3.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require';
 
 export const pool = new Pool({
   connectionString: databaseUrl,
-  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
+  ssl: { rejectUnauthorized: false }
 });
 
 // Test database connection

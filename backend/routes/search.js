@@ -13,7 +13,7 @@ router.post('/text', async (req, res) => {
     }
 
     // Call AI service to get text embedding
-    const aiServiceUrl = process.env.AI_SERVICE_URL || 'http://localhost:8000';
+    const aiServiceUrl = process.env.AI_SERVICE_URL || 'http://localhost:8001';
     let embedding;
     
     try {
@@ -110,7 +110,7 @@ router.post('/image', async (req, res) => {
     }
 
     // Call AI service to get image embedding
-    const aiServiceUrl = process.env.AI_SERVICE_URL || 'http://localhost:8000';
+    const aiServiceUrl = process.env.AI_SERVICE_URL || 'http://localhost:8001';
     let embedding;
     
     try {
@@ -184,7 +184,7 @@ router.post('/hybrid', async (req, res) => {
     let textEmbedding = null;
     let imageEmbedding = null;
 
-    const aiServiceUrl = process.env.AI_SERVICE_URL || 'http://localhost:8000';
+    const aiServiceUrl = process.env.AI_SERVICE_URL || 'http://localhost:8001';
     
     // Get text embedding if query provided
     if (query) {

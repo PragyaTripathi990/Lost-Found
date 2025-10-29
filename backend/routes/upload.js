@@ -42,7 +42,7 @@ router.post('/image', upload.single('image'), async (req, res) => {
 
     // Upload to Supabase storage
     const { data: uploadData, error: uploadError } = await supabase.storage
-      .from('images')
+      .from('lost-found-images')
       .upload(filePath, req.file.buffer, {
         contentType: req.file.mimetype,
         cacheControl: '3600'
@@ -54,14 +54,14 @@ router.post('/image', upload.single('image'), async (req, res) => {
 
     // Get public URL
     const { data: urlData } = supabase.storage
-      .from('images')
+      .from('lost-found-images')
       .getPublicUrl(filePath);
 
     const imageUrl = urlData.publicUrl;
 
     // Get image embedding from AI service
     const imageBase64 = req.file.buffer.toString('base64');
-    const aiServiceUrl = process.env.AI_SERVICE_URL || 'http://localhost:8000';
+    const aiServiceUrl = process.env.AI_SERVICE_URL || 'http://localhost:8001';
     let imageEmbedding = null;
     let textEmbedding = null;
 
@@ -98,12 +98,16 @@ router.post('/image', upload.single('image'), async (req, res) => {
       textEmbedding = Array(512).fill(0).map(() => Math.random() - 0.5);
     }
 
+    // Convert embeddings to PostgreSQL vector format
+    const imageVector = imageEmbedding ? `[${imageEmbedding.join(',')}]` : `[${Array(512).fill(0).join(',')}]`;
+    const textVector = textEmbedding ? `[${textEmbedding.join(',')}]` : `[${Array(512).fill(0).join(',')}]`;
+
     // Save to database
     const result = await pool.query(
       `INSERT INTO items (title, description, location, type, image_url, image_embedding, text_embedding)
-       VALUES ($1, $2, $3, $4, $5, $6, $7)
+       VALUES ($1, $2, $3, $4, $5, $6::vector, $7::vector)
        RETURNING *`,
-      [title, description, location, type, imageUrl, imageEmbedding, textEmbedding]
+      [title, description, location, type, imageUrl, imageVector, textVector]
     );
 
     res.status(201).json({
@@ -150,7 +154,7 @@ router.post('/images', upload.array('images', 5), async (req, res) => {
 
       // Upload to Supabase storage
       const { data: uploadData, error: uploadError } = await supabase.storage
-        .from('images')
+        .from('lost-found-images')
         .upload(filePath, file.buffer, {
           contentType: file.mimetype,
           cacheControl: '3600'
@@ -163,7 +167,7 @@ router.post('/images', upload.array('images', 5), async (req, res) => {
 
       // Get public URL
       const { data: urlData } = supabase.storage
-        .from('images')
+        .from('lost-found-images')
         .getPublicUrl(filePath);
 
       uploadResults.push({
@@ -185,7 +189,7 @@ router.post('/images', upload.array('images', 5), async (req, res) => {
     const imageBase64 = req.files[0].buffer.toString('base64');
 
     // Get embeddings
-    const aiServiceUrl = process.env.AI_SERVICE_URL || 'http://localhost:8000';
+    const aiServiceUrl = process.env.AI_SERVICE_URL || 'http://localhost:8001';
     let imageEmbedding = null;
     let textEmbedding = null;
 
@@ -218,12 +222,16 @@ router.post('/images', upload.array('images', 5), async (req, res) => {
       textEmbedding = Array(512).fill(0).map(() => Math.random() - 0.5);
     }
 
+    // Convert embeddings to PostgreSQL vector format
+    const imageVector = imageEmbedding ? `[${imageEmbedding.join(',')}]` : `[${Array(512).fill(0).join(',')}]`;
+    const textVector = textEmbedding ? `[${textEmbedding.join(',')}]` : `[${Array(512).fill(0).join(',')}]`;
+
     // Save to database with primary image URL
     const result = await pool.query(
       `INSERT INTO items (title, description, location, type, image_url, image_embedding, text_embedding)
-       VALUES ($1, $2, $3, $4, $5, $6, $7)
+       VALUES ($1, $2, $3, $4, $5, $6::vector, $7::vector)
        RETURNING *`,
-      [title, description, location, type, primaryImage.url, imageEmbedding, textEmbedding]
+      [title, description, location, type, primaryImage.url, imageVector, textVector]
     );
 
     res.status(201).json({
