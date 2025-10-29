@@ -10,7 +10,6 @@
     "start-backend": "cd backend && npm run dev",
     "start-ai": "cd python-ai && source venv/bin/activate && python app.py",
     "start-frontend": "cd frontend && npm run dev",
-    "build": "cd frontend && npm run build",
     "test": "echo 'No tests specified' && exit 0"
   },
   "keywords": [
