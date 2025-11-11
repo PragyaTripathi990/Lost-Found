@@ -26,12 +26,12 @@ router.post('/image', upload.single('image'), async (req, res) => {
       return res.status(400).json({ success: false, error: 'No image file provided' });
     }
 
-    const { title, description, location, type } = req.body;
+    const { title, description, location, type, contactInfo } = req.body;
     
-    if (!title || !description || !location || !type) {
+    if (!title || !description || !location || !type || !contactInfo) {
       return res.status(400).json({ 
         success: false, 
-        error: 'Title, description, location, and type are required' 
+        error: 'Title, description, location, type, and contact information are required' 
       });
     }
 
@@ -104,10 +104,10 @@ router.post('/image', upload.single('image'), async (req, res) => {
 
     // Save to database
     const result = await pool.query(
-      `INSERT INTO items (title, description, location, type, image_url, image_embedding, text_embedding)
-       VALUES ($1, $2, $3, $4, $5, $6::vector, $7::vector)
+      `INSERT INTO items (title, description, location, type, image_url, image_embedding, text_embedding, contact_info)
+       VALUES ($1, $2, $3, $4, $5, $6::vector, $7::vector, $8)
        RETURNING *`,
-      [title, description, location, type, imageUrl, imageVector, textVector]
+      [title, description, location, type, imageUrl, imageVector, textVector, contactInfo]
     );
 
     res.status(201).json({
@@ -133,12 +133,12 @@ router.post('/images', upload.array('images', 5), async (req, res) => {
       return res.status(400).json({ success: false, error: 'No image files provided' });
     }
 
-    const { title, description, location, type } = req.body;
+    const { title, description, location, type, contactInfo } = req.body;
     
-    if (!title || !description || !location || !type) {
+    if (!title || !description || !location || !type || !contactInfo) {
       return res.status(400).json({ 
         success: false, 
-        error: 'Title, description, location, and type are required' 
+        error: 'Title, description, location, type, and contact information are required' 
       });
     }
 
@@ -228,10 +228,10 @@ router.post('/images', upload.array('images', 5), async (req, res) => {
 
     // Save to database with primary image URL
     const result = await pool.query(
-      `INSERT INTO items (title, description, location, type, image_url, image_embedding, text_embedding)
-       VALUES ($1, $2, $3, $4, $5, $6::vector, $7::vector)
+      `INSERT INTO items (title, description, location, type, image_url, image_embedding, text_embedding, contact_info)
+       VALUES ($1, $2, $3, $4, $5, $6::vector, $7::vector, $8)
        RETURNING *`,
-      [title, description, location, type, primaryImage.url, imageVector, textVector]
+      [title, description, location, type, primaryImage.url, imageVector, textVector, contactInfo]
     );
 
     res.status(201).json({

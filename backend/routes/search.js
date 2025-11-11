@@ -5,12 +5,13 @@ const router = express.Router();
 
 // Text-based search using CLIP embeddings
 router.post('/text', async (req, res) => {
+  const { query, limit = 5, type, location, minSimilarity = 0.2 } = req.body;
+  
+  if (!query) {
+    return res.status(400).json({ success: false, error: 'Search query is required' });
+  }
+
   try {
-    const { query, limit = 5, type, location } = req.body;
-    
-    if (!query) {
-      return res.status(400).json({ success: false, error: 'Search query is required' });
-    }
 
     // Call AI service to get text embedding
     const aiServiceUrl = process.env.AI_SERVICE_URL || 'http://localhost:8001';
@@ -36,50 +37,58 @@ router.post('/text', async (req, res) => {
     }
 
     // Build similarity search query with hybrid scoring
-    // Combines semantic similarity (text embeddings) with keyword matching boost
-    // This gives better results for exact string matches like "milton bottle"
-    const queryLower = query.toLowerCase();
+    // Prioritizes exact keyword matches over semantic similarity
+    // This gives better results for exact string matches like "Pen"
+    const queryLower = query.toLowerCase().trim();
     const queryWords = queryLower.split(/\s+/).filter(w => w.length > 0);
     
-    // Build keyword matching conditions for better exact match detection
-    // Use PostgreSQL's text search to count word matches
-    let keywordBoost = `
+    // Build keyword matching score - exact matches get very high scores
+    let keywordScore = `
       (
         CASE 
-          -- Exact match in title: +0.6 boost (highest priority)
-          WHEN LOWER(title) = $2 THEN 0.6
-          -- Title contains full query as substring: +0.5 boost
-          WHEN LOWER(title) LIKE $3 THEN 0.5
-          -- Title contains all query words (using word boundary matching): +0.4 boost
+          -- Exact match in title: 0.95 (near perfect match)
+          WHEN LOWER(TRIM(title)) = $2 THEN 0.95
+          -- Title contains full query as substring: 0.85
+          WHEN LOWER(title) LIKE $3 THEN 0.85
+          -- Title contains all query words: 0.75
           WHEN (
             SELECT COUNT(*) FROM unnest(string_to_array(LOWER($2), ' ')) AS word
             WHERE LOWER(title) LIKE '%' || word || '%'
-          ) = ${queryWords.length} THEN 0.4
-          -- Description contains full query: +0.3 boost
-          WHEN LOWER(description) LIKE $3 THEN 0.3
-          -- Description contains all query words: +0.25 boost
+          ) = ${queryWords.length} THEN 0.75
+          -- Description contains full query: 0.65
+          WHEN LOWER(description) LIKE $3 THEN 0.65
+          -- Description contains all query words: 0.55
           WHEN (
             SELECT COUNT(*) FROM unnest(string_to_array(LOWER($2), ' ')) AS word
             WHERE LOWER(description) LIKE '%' || word || '%'
-          ) = ${queryWords.length} THEN 0.25
-          -- Title contains any query word: +0.15 boost
-          WHEN LOWER(title) LIKE $4 THEN 0.15
-          -- Description contains any query word: +0.1 boost
-          WHEN LOWER(description) LIKE $4 THEN 0.1
+          ) = ${queryWords.length} THEN 0.55
+          -- Title contains any query word: 0.45
+          WHEN LOWER(title) LIKE $4 THEN 0.45
+          -- Description contains any query word: 0.35
+          WHEN LOWER(description) LIKE $4 THEN 0.35
           ELSE 0
         END
       )
     `;
     
+    // Get semantic similarity from embeddings
+    let semanticScore = `GREATEST(0, 1 - (text_embedding <=> $1))`;
+    
+    // For exact title matches, use keyword score directly (95%+)
+    // For other matches, combine keyword (70% weight) + semantic (30% weight)
     let sqlQuery = `
       SELECT 
-        id, title, description, location, type, image_url, created_at,
-        LEAST(1.0,
-          -- Semantic similarity from text embeddings (50% weight)
-          GREATEST(0, 1 - (text_embedding <=> $1)) * 0.5 +
-          -- Keyword matching boost (50% weight) - higher weight for exact matches
-          ${keywordBoost} * 0.5
-        ) as similarity_score
+        id, title, description, location, type, image_url, created_at, 
+        COALESCE(contact_info, '') as contact_info,
+        CASE
+          -- Exact title match: use keyword score directly (0.95)
+          WHEN LOWER(TRIM(title)) = $2 THEN ${keywordScore}
+          -- Other matches: 70% keyword + 30% semantic
+          ELSE LEAST(1.0,
+            ${keywordScore} * 0.7 +
+            ${semanticScore} * 0.3
+          )
+        END as similarity_score
       FROM items
       WHERE text_embedding IS NOT NULL
     `;
@@ -88,7 +97,7 @@ router.post('/text', async (req, res) => {
       JSON.stringify(embedding),
       queryLower, // $2: Exact match and for word array
       `%${queryLower}%`, // $3: Contains full query
-      `%${queryWords[0]}%` // $4: Contains first word (for any word match)
+      queryWords.length > 0 ? `%${queryWords[0]}%` : '%' // $4: Contains first word (for any word match)
     ];
     let paramCount = 4;
 
@@ -101,6 +110,16 @@ router.post('/text', async (req, res) => {
       sqlQuery += ` AND location ILIKE $${++paramCount}`;
       params.push(`%${location}%`);
     }
+
+    // Filter by minimum similarity threshold (default 20%) using HAVING
+    // We need to wrap in a subquery to use HAVING with calculated columns
+    sqlQuery = `
+      SELECT * FROM (
+        ${sqlQuery}
+      ) AS ranked_items
+      WHERE similarity_score >= $${++paramCount}
+    `;
+    params.push(minSimilarity);
 
     sqlQuery += ` ORDER BY similarity_score DESC LIMIT $${++paramCount}`;
     params.push(limit);
@@ -127,33 +146,10 @@ router.post('/text', async (req, res) => {
     });
   } catch (error) {
     console.error('Error in text search:', error);
-    // Return mock search results for demo purposes
-    res.json({
-      success: true,
-      data: [
-        {
-          id: 1,
-          title: "Black Water Bottle",
-          description: "A black insulated water bottle found near the library",
-          location: "Library Building",
-          type: "found",
-          image_url: "https://via.placeholder.com/300x200?text=Water+Bottle",
-          created_at: new Date().toISOString(),
-          similarity_score: 0.95
-        },
-        {
-          id: 2,
-          title: "Blue Umbrella",
-          description: "Navy blue umbrella left in the cafeteria",
-          location: "Cafeteria",
-          type: "found",
-          image_url: "https://via.placeholder.com/300x200?text=Umbrella",
-          created_at: new Date().toISOString(),
-          similarity_score: 0.87
-        }
-      ],
-      query: query,
-      total: 2
+    res.status(500).json({ 
+      success: false, 
+      error: 'Text search failed',
+      details: error.message 
     });
   }
 });
@@ -161,7 +157,7 @@ router.post('/text', async (req, res) => {
 // Image-based search using CLIP embeddings
 router.post('/image', async (req, res) => {
   try {
-    const { imageData, limit = 5, type, location } = req.body;
+    const { imageData, limit = 5, type, location, minSimilarity = 0.2 } = req.body;
     
     if (!imageData) {
       return res.status(400).json({ success: false, error: 'Image data is required' });
@@ -195,7 +191,8 @@ router.post('/image', async (req, res) => {
     // Convert to similarity (0-1, higher is better): GREATEST(0, 1 - distance)
     // This ensures similarity_score is always 0-1, preventing negative percentages
     let sqlQuery = `
-      SELECT id, title, description, location, type, image_url, created_at,
+      SELECT id, title, description, location, type, image_url, created_at, 
+             COALESCE(contact_info, '') as contact_info,
              GREATEST(0, 1 - (image_embedding <=> $1)) as similarity_score
       FROM items
       WHERE image_embedding IS NOT NULL
@@ -213,6 +210,10 @@ router.post('/image', async (req, res) => {
       sqlQuery += ` AND location ILIKE $${++paramCount}`;
       params.push(`%${location}%`);
     }
+
+    // Filter by minimum similarity threshold (default 20%)
+    sqlQuery += ` AND GREATEST(0, 1 - (image_embedding <=> $1)) >= $${++paramCount}`;
+    params.push(minSimilarity);
 
     sqlQuery += ` ORDER BY similarity_score DESC LIMIT $${++paramCount}`;
     params.push(limit);
@@ -244,7 +245,7 @@ router.post('/image', async (req, res) => {
 // Hybrid search (both text and image)
 router.post('/hybrid', async (req, res) => {
   try {
-    const { query, imageData, limit = 5, type, location, textWeight = 0.5 } = req.body;
+    const { query, imageData, limit = 5, type, location, textWeight = 0.5, minSimilarity = 0.2 } = req.body;
     
     if (!query && !imageData) {
       return res.status(400).json({ 
@@ -298,7 +299,9 @@ router.post('/hybrid', async (req, res) => {
 
     // Build hybrid similarity search query
     let sqlQuery = `
-      SELECT id, title, description, location, type, image_url, created_at,
+      SELECT * FROM (
+        SELECT id, title, description, location, type, image_url, created_at, 
+               COALESCE(contact_info, '') as contact_info,
     `;
     
     const params = [];
@@ -326,8 +329,8 @@ router.post('/hybrid', async (req, res) => {
     }
 
     sqlQuery += `
-      FROM items
-      WHERE 1=1
+        FROM items
+        WHERE 1=1
     `;
 
     if (type) {
@@ -339,6 +342,10 @@ router.post('/hybrid', async (req, res) => {
       sqlQuery += ` AND location ILIKE $${++paramCount}`;
       params.push(`%${location}%`);
     }
+
+    // Close subquery and filter by minimum similarity threshold (default 20%)
+    sqlQuery += `) AS ranked_items WHERE similarity_score >= $${++paramCount}`;
+    params.push(minSimilarity);
 
     sqlQuery += ` ORDER BY similarity_score DESC LIMIT $${++paramCount}`;
     params.push(limit);

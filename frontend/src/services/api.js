@@ -28,17 +28,20 @@ class ApiService {
 
   // Search methods
   async searchByText(query, filters = {}) {
+    const { minSimilarity = 0.2, ...otherFilters } = filters;
     return this.request('/search/text', {
       method: 'POST',
       body: JSON.stringify({
         query,
-        ...filters,
+        ...otherFilters,
+        minSimilarity,
         limit: 10
       }),
     });
   }
 
   async searchByImage(imageFile, filters = {}) {
+    const { minSimilarity = 0.2, ...otherFilters } = filters;
     const formData = new FormData();
     formData.append('image', imageFile);
     
@@ -52,14 +55,16 @@ class ApiService {
       },
       body: JSON.stringify({
         imageData: base64,
-        ...filters,
+        ...otherFilters,
+        minSimilarity,
         limit: 10
       }),
     });
   }
 
   async searchHybrid(query, imageFile, filters = {}) {
-    const body = { ...filters, limit: 10 };
+    const { minSimilarity = 0.2, ...otherFilters } = filters;
+    const body = { ...otherFilters, minSimilarity, limit: 10 };
     
     if (query) {
       body.query = query;

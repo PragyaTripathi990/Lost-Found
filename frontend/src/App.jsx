@@ -13,9 +13,9 @@ function App() {
       <div className="min-h-screen bg-gradient-dark text-dark-text-primary">
         <Header activeTab={activeTab} setActiveTab={setActiveTab} />
         
-        <main className="container mx-auto px-4 py-8 max-w-7xl">
+        <main className="container mx-auto px-3 sm:px-4 py-4 sm:py-8 max-w-7xl">
           {activeTab === 'search' && (
-            <div className="space-y-8">
+            <div className="space-y-4 sm:space-y-8">
               <SearchSection />
               <ResultsSection />
             </div>

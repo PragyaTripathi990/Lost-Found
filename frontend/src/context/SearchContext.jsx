@@ -10,7 +10,8 @@ const initialState = {
   hasSearched: false, // Track if a search has been performed
   filters: {
     type: '', // 'lost', 'found', or ''
-    location: ''
+    location: '',
+    minSimilarity: 0.2 // Minimum match percentage (0.2 = 20%)
   },
   error: null
 };
