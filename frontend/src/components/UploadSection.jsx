@@ -88,16 +88,16 @@ const UploadSection = () => {
 
   if (uploadSuccess) {
     return (
-      <div className="bg-white rounded-lg shadow-sm border p-8">
+      <div className="bg-gradient-card rounded-lg shadow-2xl border border-dark-border p-8">
         <div className="text-center">
-          <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
-          <h3 className="text-2xl font-bold text-gray-900 mb-2">Upload Successful!</h3>
-          <p className="text-gray-600 mb-6">
+          <CheckCircle className="w-16 h-16 text-green-400 mx-auto mb-4" />
+          <h3 className="text-2xl font-bold text-dark-text-primary mb-2">Upload Successful!</h3>
+          <p className="text-dark-text-secondary mb-6">
             Your item has been uploaded and will be searchable by others.
           </p>
           <button
             onClick={() => setUploadSuccess(false)}
-            className="px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+            className="px-6 py-3 bg-gradient-primary text-white rounded-lg hover:shadow-lg hover:shadow-primary-500/30 transition-all"
           >
             Upload Another Item
           </button>
@@ -107,12 +107,12 @@ const UploadSection = () => {
   }
 
   return (
-    <div className="bg-white/70 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 p-8">
+    <div className="bg-gradient-card backdrop-blur-sm rounded-2xl shadow-2xl border border-dark-border p-8">
       <div className="mb-8">
-        <h2 className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent mb-3">
+        <h2 className="text-3xl font-bold bg-gradient-primary bg-clip-text text-transparent mb-3">
           Upload Item
         </h2>
-        <p className="text-gray-600 text-lg">
+        <p className="text-dark-text-secondary text-lg">
           Upload a lost or found item to help others find what they're looking for using AI
         </p>
       </div>
@@ -121,7 +121,7 @@ const UploadSection = () => {
         {/* Basic Information */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-3">
+            <label className="block text-sm font-semibold text-dark-text-primary mb-3">
               Title *
             </label>
             <input
@@ -130,20 +130,20 @@ const UploadSection = () => {
               value={formData.title}
               onChange={handleInputChange}
               placeholder="Brief description of the item"
-              className="w-full px-6 py-4 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white/80 backdrop-blur-sm text-lg shadow-sm transition-all duration-200"
+              className="w-full px-6 py-4 border border-dark-border rounded-2xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-dark-surface text-dark-text-primary placeholder-dark-text-muted text-lg shadow-lg transition-all duration-200"
               required
             />
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-3">
+            <label className="block text-sm font-semibold text-dark-text-primary mb-3">
               Type *
             </label>
             <select
               name="type"
               value={formData.type}
               onChange={handleInputChange}
-              className="w-full px-6 py-4 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white/80 backdrop-blur-sm text-lg shadow-sm transition-all duration-200"
+              className="w-full px-6 py-4 border border-dark-border rounded-2xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-dark-surface text-dark-text-primary text-lg shadow-lg transition-all duration-200"
               required
             >
               <option value="found">Found Item</option>
@@ -153,7 +153,7 @@ const UploadSection = () => {
         </div>
 
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-3">
+          <label className="block text-sm font-semibold text-dark-text-primary mb-3">
             Description *
           </label>
           <textarea
@@ -162,14 +162,14 @@ const UploadSection = () => {
             onChange={handleInputChange}
             placeholder="Detailed description of the item, including color, brand, condition, etc."
             rows={4}
-            className="w-full px-6 py-4 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white/80 backdrop-blur-sm text-lg shadow-sm transition-all duration-200 resize-none"
+            className="w-full px-6 py-4 border border-dark-border rounded-2xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-dark-surface text-dark-text-primary placeholder-dark-text-muted text-lg shadow-lg transition-all duration-200 resize-none"
             required
           />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-3">
+            <label className="block text-sm font-semibold text-dark-text-primary mb-3">
               Location *
             </label>
             <input
@@ -178,13 +178,13 @@ const UploadSection = () => {
               value={formData.location}
               onChange={handleInputChange}
               placeholder="e.g., Library, Cafeteria, Uniworld 1"
-              className="w-full px-6 py-4 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white/80 backdrop-blur-sm text-lg shadow-sm transition-all duration-200"
+              className="w-full px-6 py-4 border border-dark-border rounded-2xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-dark-surface text-dark-text-primary placeholder-dark-text-muted text-lg shadow-lg transition-all duration-200"
               required
             />
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-3">
+            <label className="block text-sm font-semibold text-dark-text-primary mb-3">
               Contact Information
             </label>
             <input
@@ -193,20 +193,20 @@ const UploadSection = () => {
               value={formData.contactInfo}
               onChange={handleInputChange}
               placeholder="Phone number or email (optional)"
-              className="w-full px-6 py-4 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white/80 backdrop-blur-sm text-lg shadow-sm transition-all duration-200"
+              className="w-full px-6 py-4 border border-dark-border rounded-2xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-dark-surface text-dark-text-primary placeholder-dark-text-muted text-lg shadow-lg transition-all duration-200"
             />
           </div>
         </div>
 
         {/* Image Upload */}
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-3">
+          <label className="block text-sm font-semibold text-dark-text-primary mb-3">
             Images *
           </label>
-          <div className="border-2 border-dashed border-gray-300 rounded-2xl p-8 bg-white/50 backdrop-blur-sm hover:border-blue-400 transition-colors duration-200">
+          <div className="border-2 border-dashed border-dark-border rounded-2xl p-8 bg-dark-surface/50 backdrop-blur-sm hover:border-primary-500 transition-colors duration-200">
             <div className="text-center">
-              <Camera className="w-16 h-16 text-gray-400 mx-auto mb-6" />
-              <p className="text-gray-600 mb-6 text-lg">
+              <Camera className="w-16 h-16 text-dark-text-muted mx-auto mb-6" />
+              <p className="text-dark-text-secondary mb-6 text-lg">
                 Upload clear photos of the item from different angles
               </p>
               <input
@@ -219,7 +219,7 @@ const UploadSection = () => {
               />
               <label
                 htmlFor="image-upload"
-                className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-700 text-white rounded-2xl hover:from-blue-700 hover:to-indigo-800 cursor-pointer shadow-lg hover:shadow-xl transition-all duration-200 font-medium"
+                className="inline-flex items-center px-8 py-4 bg-gradient-primary text-white rounded-2xl hover:shadow-lg hover:shadow-primary-500/30 cursor-pointer shadow-lg transition-all duration-200 font-medium"
               >
                 <Upload className="w-5 h-5 mr-2" />
                 Choose Images
@@ -236,7 +236,7 @@ const UploadSection = () => {
                     <img
                       src={img.preview}
                       alt="Preview"
-                      className="w-full h-32 object-cover rounded-2xl shadow-lg group-hover:scale-105 transition-transform duration-200"
+                      className="w-full h-32 object-cover rounded-2xl shadow-lg border border-dark-border group-hover:scale-105 transition-transform duration-200"
                     />
                     <button
                       type="button"
@@ -257,7 +257,7 @@ const UploadSection = () => {
           <button
             type="submit"
             disabled={isUploading}
-            className="px-12 py-4 bg-gradient-to-r from-blue-600 to-indigo-700 text-white rounded-2xl hover:from-blue-700 hover:to-indigo-800 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-3 shadow-lg hover:shadow-xl transition-all duration-200 font-medium text-lg"
+            className="px-12 py-4 bg-gradient-primary text-white rounded-2xl hover:shadow-lg hover:shadow-primary-500/30 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-3 shadow-lg transition-all duration-200 font-medium text-lg"
           >
             {isUploading ? (
               <>

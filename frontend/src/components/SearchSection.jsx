@@ -83,24 +83,24 @@ const SearchSection = () => {
   };
 
   return (
-    <div className="bg-white/70 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 p-8">
+    <div className="bg-gradient-card backdrop-blur-sm rounded-2xl shadow-2xl border border-dark-border p-8">
       <div className="mb-8">
-        <h2 className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent mb-3">
+        <h2 className="text-3xl font-bold bg-gradient-primary bg-clip-text text-transparent mb-3">
           Find Your Items
         </h2>
-        <p className="text-gray-600 text-lg">
+        <p className="text-dark-text-secondary text-lg">
           Search by text description or upload an image to find similar items using AI
         </p>
       </div>
 
       {/* Search Type Tabs */}
-      <div className="flex space-x-2 mb-8 bg-gray-100/50 p-2 rounded-2xl">
+      <div className="flex space-x-2 mb-8 bg-dark-surface/50 p-2 rounded-2xl border border-dark-border">
         <button
           onClick={() => setSearchType('text')}
           className={`flex-1 flex items-center justify-center space-x-2 py-3 px-6 rounded-xl transition-all duration-200 font-medium ${
             searchType === 'text'
-              ? 'bg-white text-blue-700 shadow-lg transform scale-105'
-              : 'text-gray-600 hover:text-gray-900 hover:bg-white/50'
+              ? 'bg-gradient-primary text-white shadow-lg shadow-primary-500/30 transform scale-105'
+              : 'text-dark-text-secondary hover:text-dark-text-primary hover:bg-dark-card/50'
           }`}
         >
           <Search className="w-5 h-5" />
@@ -111,8 +111,8 @@ const SearchSection = () => {
           onClick={() => setSearchType('image')}
           className={`flex-1 flex items-center justify-center space-x-2 py-3 px-6 rounded-xl transition-all duration-200 font-medium ${
             searchType === 'image'
-              ? 'bg-white text-blue-700 shadow-lg transform scale-105'
-              : 'text-gray-600 hover:text-gray-900 hover:bg-white/50'
+              ? 'bg-gradient-primary text-white shadow-lg shadow-primary-500/30 transform scale-105'
+              : 'text-dark-text-secondary hover:text-dark-text-primary hover:bg-dark-card/50'
           }`}
         >
           <Camera className="w-5 h-5" />
@@ -130,14 +130,14 @@ const SearchSection = () => {
                 value={searchQuery}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Describe what you're looking for... (e.g., 'black water bottle near library')"
-                className="w-full px-6 py-4 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white/80 backdrop-blur-sm text-lg shadow-sm transition-all duration-200"
+                className="w-full px-6 py-4 border border-dark-border rounded-2xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-dark-surface text-dark-text-primary placeholder-dark-text-muted text-lg shadow-lg transition-all duration-200"
                 disabled={isLoading}
               />
             </div>
             <button
               type="submit"
               disabled={isLoading || !searchQuery.trim()}
-              className="px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-700 text-white rounded-2xl hover:from-blue-700 hover:to-indigo-800 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2 shadow-lg hover:shadow-xl transition-all duration-200 font-medium"
+              className="px-8 py-4 bg-gradient-primary text-white rounded-2xl hover:shadow-lg hover:shadow-primary-500/30 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2 shadow-lg transition-all duration-200 font-medium"
             >
               <Search className="w-5 h-5" />
               <span>{isLoading ? 'Searching...' : 'Search'}</span>
@@ -148,18 +148,18 @@ const SearchSection = () => {
 
       {searchType === 'image' && (
         <form onSubmit={handleImageSearch} className="space-y-6">
-          <div className="border-2 border-dashed border-gray-300 rounded-2xl p-8 text-center bg-white/50 backdrop-blur-sm hover:border-blue-400 transition-colors duration-200">
+          <div className="border-2 border-dashed border-dark-border rounded-2xl p-8 text-center bg-dark-surface/50 backdrop-blur-sm hover:border-primary-500 transition-colors duration-200">
             {imagePreview ? (
               <div className="space-y-6">
                 <img
                   src={imagePreview}
                   alt="Preview"
-                  className="mx-auto max-h-64 rounded-2xl shadow-lg"
+                  className="mx-auto max-h-64 rounded-2xl shadow-lg border border-dark-border"
                 />
                 <button
                   type="button"
                   onClick={clearImage}
-                  className="text-red-600 hover:text-red-700 flex items-center space-x-2 mx-auto px-4 py-2 rounded-xl hover:bg-red-50 transition-colors duration-200"
+                  className="text-red-400 hover:text-red-300 flex items-center space-x-2 mx-auto px-4 py-2 rounded-xl hover:bg-red-500/10 transition-colors duration-200"
                 >
                   <X className="w-4 h-4" />
                   <span>Remove Image</span>
@@ -167,8 +167,8 @@ const SearchSection = () => {
               </div>
             ) : (
               <div>
-                <Camera className="w-16 h-16 text-gray-400 mx-auto mb-6" />
-                <p className="text-gray-600 mb-6 text-lg">Upload an image to search for similar items</p>
+                <Camera className="w-16 h-16 text-dark-text-muted mx-auto mb-6" />
+                <p className="text-dark-text-secondary mb-6 text-lg">Upload an image to search for similar items</p>
                 <input
                   type="file"
                   accept="image/*"
@@ -178,7 +178,7 @@ const SearchSection = () => {
                 />
                 <label
                   htmlFor="image-upload"
-                  className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-700 text-white rounded-2xl hover:from-blue-700 hover:to-indigo-800 cursor-pointer shadow-lg hover:shadow-xl transition-all duration-200 font-medium"
+                  className="inline-flex items-center px-8 py-4 bg-gradient-primary text-white rounded-2xl hover:shadow-lg hover:shadow-primary-500/30 cursor-pointer shadow-lg transition-all duration-200 font-medium"
                 >
                   <Camera className="w-5 h-5 mr-2" />
                   Choose Image
@@ -191,7 +191,7 @@ const SearchSection = () => {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-700 text-white rounded-2xl hover:from-blue-700 hover:to-indigo-800 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl transition-all duration-200 font-medium"
+              className="w-full px-8 py-4 bg-gradient-primary text-white rounded-2xl hover:shadow-lg hover:shadow-primary-500/30 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2 shadow-lg transition-all duration-200 font-medium"
             >
               <Search className="w-5 h-5" />
               <span>{isLoading ? 'Searching...' : 'Search by Image'}</span>
@@ -204,7 +204,7 @@ const SearchSection = () => {
       <div className="flex items-center justify-between mt-8">
         <button
           onClick={() => setShowFilters(!showFilters)}
-          className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 px-4 py-2 rounded-xl hover:bg-white/50 transition-colors duration-200"
+          className="flex items-center space-x-2 text-dark-text-secondary hover:text-dark-text-primary px-4 py-2 rounded-xl hover:bg-dark-card/50 transition-colors duration-200"
         >
           <Filter className="w-5 h-5" />
           <span className="font-medium">Advanced Filters</span>
@@ -212,16 +212,16 @@ const SearchSection = () => {
       </div>
 
       {showFilters && (
-        <div className="mt-6 p-6 bg-white/50 backdrop-blur-sm rounded-2xl space-y-6 border border-white/20">
+        <div className="mt-6 p-6 bg-dark-surface/50 backdrop-blur-sm rounded-2xl space-y-6 border border-dark-border">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-3">
+              <label className="block text-sm font-semibold text-dark-text-primary mb-3">
                 Item Type
               </label>
               <select
                 value={filters.type}
                 onChange={(e) => setFilters({ type: e.target.value })}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white/80 backdrop-blur-sm shadow-sm transition-all duration-200"
+                className="w-full px-4 py-3 border border-dark-border rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-dark-surface text-dark-text-primary shadow-sm transition-all duration-200"
               >
                 <option value="">All Items</option>
                 <option value="lost">Lost Items</option>
@@ -230,7 +230,7 @@ const SearchSection = () => {
             </div>
             
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-3">
+              <label className="block text-sm font-semibold text-dark-text-primary mb-3">
                 Location
               </label>
               <input
@@ -238,7 +238,7 @@ const SearchSection = () => {
                 value={filters.location}
                 onChange={(e) => setFilters({ location: e.target.value })}
                 placeholder="e.g., Library, Cafeteria, Uniworld 1"
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white/80 backdrop-blur-sm shadow-sm transition-all duration-200"
+                className="w-full px-4 py-3 border border-dark-border rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-dark-surface text-dark-text-primary placeholder-dark-text-muted shadow-sm transition-all duration-200"
               />
             </div>
           </div>
