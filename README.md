@@ -1,191 +1,142 @@
-# Lost & Found App with AI-Powered Search
+# Lost & Found
 
-A modern web application that helps users find lost items using AI-powered image and text search capabilities. Built with React, Node.js, and CLIP embeddings for semantic similarity search.
+**AI-Powered Campus Search Platform with Semantic Similarity**
 
-## Features
+Search for lost items using natural language descriptions or photos. Built with a multi-service architecture --- Express REST API for core operations and a FastAPI microservice running CLIP for cross-modal vector search. Deployed campus-wide and adopted by 2000+ students.
 
-- 🔍 **Text Search**: Search for items using natural language descriptions
-- 📸 **Image Search**: Upload photos to find visually similar items
-- 🤖 **AI-Powered**: Uses CLIP model for semantic understanding
-- 📍 **Location Filtering**: Filter results by location
-- 📱 **Modern UI**: Beautiful, responsive interface with TailwindCSS
-- ⚡ **Fast Search**: Vector similarity search with pgvector
+---
+
+## Architecture
+
+```
+React Frontend (Vite + TailwindCSS)
+        |
+        v
+Express REST API (Node.js)
+    |           |           |
+    v           v           v
+ Items       Search      Upload
+ CRUD      Orchestrator  Pipeline
+    |           |           |
+    v           v           v
+Supabase    FastAPI      Supabase
+(PostgreSQL) AI Service   Storage
+              |
+              v
+         CLIP Model
+    (HuggingFace Transformers)
+              |
+              v
+     Vector Embeddings
+              |
+              v
+    pgvector Similarity Search
+    (Cosine Distance Ranking)
+```
+
+## How It Works
+
+### Upload Flow
+1. User uploads image(s) + text description
+2. Images stored in Supabase Storage
+3. CLIP model generates vector embeddings for both image and text
+4. Embeddings stored in PostgreSQL via pgvector extension
+
+### Search Flow
+1. User enters text query OR uploads a photo
+2. CLIP generates embedding for the query
+3. pgvector performs cosine similarity search against stored embeddings
+4. Results ranked by similarity score and returned
+
+### Cross-Modal Search
+CLIP captures semantic meaning across modalities:
+- **Text to Image**: "blue water bottle" finds photos of blue bottles
+- **Image to Image**: Upload a photo to find visually similar items
+- **Hybrid**: Combined text + image query for highest precision
+
+## Key Features
+
+| Feature | Details |
+|---|---|
+| Multi-Service Backend | Express API + FastAPI AI microservice |
+| Cross-Modal Search | Text-to-image, image-to-image, hybrid search |
+| Vector Search | pgvector with cosine-distance indexing |
+| Campus Filtering | Filter by campus location (Uniworld 1, Uniworld 2, SST) |
+| Auto-Archive | Items older than 2 weeks automatically archived |
+| Multi-Image Upload | Multiple images per item via Supabase Storage |
+| Sub-Second Retrieval | Optimized vector index for fast similarity queries |
 
 ## Tech Stack
 
-### Frontend
-- React 18 + Vite
-- TailwindCSS for styling
-- Lucide React for icons
-- Axios for API calls
-
-### Backend
-- Node.js + Express
-- PostgreSQL with pgvector extension
-- Supabase for storage and database
-
-### AI Service
-- Python + FastAPI
-- CLIP model (HuggingFace Transformers)
-- Vector embeddings for similarity search
-
-## Quick Start
-
-### Prerequisites
-- Node.js 18+
-- Python 3.8+
-- PostgreSQL with pgvector extension
-- Supabase account
-
-### 1. Clone and Setup
-
-```bash
-git clone <repository-url>
-cd Lost&Found
-```
-
-### 2. Database Setup
-
-1. Create a Supabase project
-2. Enable the pgvector extension in your database
-3. Run the SQL schema:
-
-```sql
--- See database/schema.sql for the complete schema
-```
-
-### 3. Backend Setup
-
-```bash
-cd backend
-npm install
-cp env.example .env
-# Edit .env with your Supabase credentials
-npm run dev
-```
-
-### 4. AI Service Setup
-
-```bash
-cd python-ai
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-pip install -r requirements.txt
-python app.py
-```
-
-### 5. Frontend Setup
-
-```bash
-cd frontend
-npm install
-cp env.example .env
-# Edit .env with your API URL
-npm run dev
-```
-
-## Environment Variables
-
-### Backend (.env)
-```
-SUPABASE_URL=your_supabase_url
-SUPABASE_ANON_KEY=your_supabase_anon_key
-SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
-DATABASE_URL=your_database_url
-PORT=5000
-NODE_ENV=development
-AI_SERVICE_URL=http://localhost:8000
-```
-
-### Frontend (.env)
-```
-VITE_API_URL=http://localhost:5000/api
-VITE_SUPABASE_URL=your_supabase_url
-VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
-```
+| Layer | Technology |
+|---|---|
+| **Frontend** | React 18, Vite, TailwindCSS, Lucide Icons, Axios |
+| **API Server** | Node.js, Express |
+| **AI Service** | Python, FastAPI, CLIP (HuggingFace Transformers) |
+| **Database** | PostgreSQL + pgvector (via Supabase) |
+| **Storage** | Supabase Storage |
+| **Deployment** | Vercel (frontend), Render (backend) |
 
 ## API Endpoints
 
 ### Items
-- `GET /api/items` - Get all items with pagination
-- `GET /api/items/:id` - Get item by ID
-- `POST /api/items` - Create new item
-- `PUT /api/items/:id` - Update item
-- `DELETE /api/items/:id` - Delete item
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | `/api/items` | List items with pagination |
+| GET | `/api/items/:id` | Get item by ID |
+| POST | `/api/items` | Create new item |
+| PUT | `/api/items/:id` | Update item |
+| DELETE | `/api/items/:id` | Delete item |
 
 ### Search
-- `POST /api/search/text` - Text-based search
-- `POST /api/search/image` - Image-based search
-- `POST /api/search/hybrid` - Combined text and image search
+| Method | Endpoint | Description |
+|---|---|---|
+| POST | `/api/search/text` | Text-based semantic search |
+| POST | `/api/search/image` | Image-based similarity search |
+| POST | `/api/search/hybrid` | Combined text + image search |
 
 ### Upload
-- `POST /api/upload/image` - Upload single image
-- `POST /api/upload/images` - Upload multiple images
+| Method | Endpoint | Description |
+|---|---|---|
+| POST | `/api/upload/image` | Upload single image |
+| POST | `/api/upload/images` | Upload multiple images |
 
-## How It Works
+## Setup
 
-1. **Upload Process**:
-   - User uploads image(s) with description
-   - Image is stored in Supabase storage
-   - CLIP model generates embeddings for both image and text
-   - Embeddings are stored in PostgreSQL with pgvector
-
-2. **Search Process**:
-   - User enters text query or uploads image
-   - CLIP generates embedding for the query
-   - Vector similarity search finds most similar items
-   - Results are ranked by similarity score
-
-3. **AI Similarity**:
-   - CLIP embeddings capture semantic meaning
-   - "water bottle" matches "flask" or "bottle"
-   - Visual similarity finds items with similar appearance
-   - Cross-modal search: text can find images and vice versa
-
-## Development
-
-### Running All Services
-
-```bash
-# Terminal 1: Backend
-cd backend && npm run dev
-
-# Terminal 2: AI Service
-cd python-ai && python app.py
-
-# Terminal 3: Frontend
-cd frontend && npm run dev
-```
-
-### Database Migrations
-
-The database schema is in `database/schema.sql`. Run this in your Supabase SQL editor to set up the tables and indexes.
-
-## Deployment
+### Prerequisites
+- Node.js 18+
+- Python 3.8+
+- Supabase account (with pgvector enabled)
 
 ### Backend
-- Deploy to Railway, Heroku, or similar
-- Set environment variables
-- Ensure database connection
+```bash
+cd backend
+npm install
+cp .env.example .env  # Add Supabase credentials
+npm run dev
+```
 
 ### AI Service
-- Deploy to Railway, Google Cloud Run, or similar
-- Install Python dependencies
-- Set up model caching
+```bash
+cd python-ai
+python -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+python app.py
+```
 
 ### Frontend
-- Deploy to Vercel, Netlify, or similar
-- Set environment variables
-- Update API URLs
+```bash
+cd frontend
+npm install
+cp .env.example .env  # Set API URL
+npm run dev
+```
 
-## Contributing
+## Production
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test thoroughly
-5. Submit a pull request
+Adopted campus-wide at Scaler School of Technology across 3 campus locations with 2000+ active student users.
 
 ## License
 
-MIT License - see LICENSE file for details
+MIT
