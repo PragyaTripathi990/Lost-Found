@@ -1,3 +1,4 @@
+// Change detection test marker — safe to remove
 import dotenv from 'dotenv';
 dotenv.config();
 
